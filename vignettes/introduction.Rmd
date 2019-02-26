@@ -1,0 +1,50 @@
+---
+title: "plsr - Partial Least Squares Made Easy"
+author: "Jan N. Schneider"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+plsr (read: "pleasure") is a package that provides simple to use Partial Least Squares Analysis.
+
+It features:
+
+* P-value calculation through permutation testing for latent variables 
+* Backward and forward prediction 
+* Various visualization functions for estimated latent variables
+
+
+## Quick Start
+
+The central function of the package is `pls()`. Given two matrices `X` and `Y` with arbitrary number of variables in columns and equal number of observations in rows this function will compute the latent variables that will maximize the covariance between `X` and `Y`.
+For example, a plsr object can be calculated like so:
+```{r, results="hide"}
+library(plsr)
+plsr_obj=pls(X=rating_data,Y=tracking_data,n_perm=1000,n_boot=10)
+```  
+## Inspecting Results
+
+Resulting latent variables and their significances can be investigated using the generic functions `summary()` and `plot()`:
+```{r}
+summary(plsr_obj)
+```
+
+```
+plot(plsr_obj)
+```
+
+```{r, echo=FALSE, fig.width = 3.5, fig.align = "center"}
+plsr:::plot_perm_results(plsr_obj)
+```
+

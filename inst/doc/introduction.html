@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Jan N. Schneider" />
+
+<meta name="date" content="2019-02-15" />
+
+<title>plsr - Partial Least Squares Made Easy</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' || rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">plsr - Partial Least Squares Made Easy</h1>
+<h4 class="author"><em>Jan N. Schneider</em></h4>
+<h4 class="date"><em>2019-02-15</em></h4>
+
+
+
+<p>plsr (read: “pleasure”) is a package that provides simple to use Partial Least Squares Analysis.</p>
+<p>It features:</p>
+<ul>
+<li>P-value calculation through permutation testing for latent variables</li>
+<li>Backward and forward prediction</li>
+<li>Various visualization functions for estimated latent variables</li>
+</ul>
+<div id="quick-start" class="section level2">
+<h2>Quick Start</h2>
+<p>The central function of the package is <code>pls()</code>. Given two matrices <code>X</code> and <code>Y</code> with arbitrary number of variables in columns and equal number of observations in rows this function will compute the latent variables that will maximize the covariance between <code>X</code> and <code>Y</code>. For example, a plsr object can be calculated like so:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(plsr)
+<span class="co">#&gt; Be aware that plsr 0.0.1 contains experimental and partly untested code.</span>
+<span class="co">#&gt; Use cautiously.</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Attaching package: 'plsr'</span>
+<span class="co">#&gt; The following object is masked from 'package:stats':</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     loadings</span>
+plsr_obj=<span class="kw">pls</span>(<span class="dt">X=</span>rating_data,<span class="dt">Y=</span>tracking_data,<span class="dt">n_perm=</span><span class="dv">1000</span>,<span class="dt">n_boot=</span><span class="dv">10</span>)
+<span class="co">#&gt; Warning in pls(X = rating_data, Y = tracking_data, n_perm = 1000, n_boot</span>
+<span class="co">#&gt; = 10): Bootstrapping functionality is still untested! No guarantee for</span>
+<span class="co">#&gt; correctness! Use with extra care.</span></code></pre></div>
+</div>
+<div id="inspecting-results" class="section level2">
+<h2>Inspecting Results</h2>
+<p>Resulting latent variables and their significances can be investigated using the generic functions <code>summary()</code> and <code>plot()</code>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(plsr_obj)
+<span class="co">#&gt; Permutation iterations: 1000 </span>
+<span class="co">#&gt; P_values:</span>
+<span class="co">#&gt; [1] 0.000999001 0.000999001 0.128871129 0.885114885 0.915084915 1.000000000</span>
+<span class="co">#&gt; [7] 1.000000000</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Bootstrap iterations: 10 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Loading matrix for Y-side (U) too big...ommited</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Loading matrix for X-side (V)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;                    LV1         LV2        LV3          LV4         LV5</span>
+<span class="co">#&gt; happy      -0.51866888 -0.03047300  0.2820295 -0.161209033  0.29692132</span>
+<span class="co">#&gt; sad         0.31765080  0.04152656 -0.3206474  0.018493299  0.46567703</span>
+<span class="co">#&gt; surprised  -0.03495412 -0.87088133 -0.1728669  0.009944748 -0.38290106</span>
+<span class="co">#&gt; disgusted   0.40324432 -0.13441072  0.3101666 -0.845374509  0.06503936</span>
+<span class="co">#&gt; angry       0.57686587 -0.19163284  0.5036483  0.497881859  0.17475943</span>
+<span class="co">#&gt; fearful     0.15606667 -0.16427285 -0.6195140 -0.077697923  0.39910665</span>
+<span class="co">#&gt; interested -0.33033581 -0.39640597  0.2325922  0.070635499  0.59524140</span>
+<span class="co">#&gt;                    LV6         LV7</span>
+<span class="co">#&gt; happy      -0.22257774  0.69772622</span>
+<span class="co">#&gt; sad        -0.75681492 -0.06777050</span>
+<span class="co">#&gt; surprised  -0.23323541  0.09669586</span>
+<span class="co">#&gt; disgusted   0.05318521 -0.03751827</span>
+<span class="co">#&gt; angry       0.11166760  0.29316232</span>
+<span class="co">#&gt; fearful     0.53208933  0.34120064</span>
+<span class="co">#&gt; interested  0.15771555 -0.54356743</span></code></pre></div>
+<pre><code>plot(plsr_obj)</code></pre>
+<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
